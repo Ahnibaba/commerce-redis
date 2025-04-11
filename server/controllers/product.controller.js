@@ -1,10 +1,13 @@
 import cloudinary from "../lib/cloudinary.js";
 import productModel from "../models/product.model.js"
+import { redis } from "../lib/redis.js"
 
 
 const getAllProducts = async (req, res) => {
     try {
         const products = await productModel.find({}) //find sll products
+        console.log(products);
+        
 
         res.status(200).json(products)
     } catch (error) {
@@ -42,7 +45,7 @@ const getFeaturedProducts = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { name, decription, price, image, category } = req.body
+        const { name, description, price, image, category } = req.body
 
         let cloudinaryResponse = null
 
@@ -58,7 +61,7 @@ const createProduct = async (req, res) => {
             category
         })
 
-        res.status(201).json(product)
+        res.status(201).json({ success: true, product })
 
     } catch (error) {
         console.log("Error in createProduct function", error.message);
@@ -136,7 +139,7 @@ const getProductsByCategory = async(req, res) => {
 
 const toggleFeaturedProduct = async(req, res) => {
     try {
-        const product = await product.findById(req.params.id)
+        const product = await productModel.findById(req.params.id)
         if(product) {
             product.isFeatured = !product.isFeatured
             const updatedProduct = await product.save()
@@ -148,7 +151,7 @@ const toggleFeaturedProduct = async(req, res) => {
         }
         
     } catch (error) {
-        console.log("Error in toggleFeaturedProduct function", error.message);
+        console.log("Error in toggleFeaturedProduct function", error);
         res.status(500).json({ message: "Server error", error: error.message })  
     }
 

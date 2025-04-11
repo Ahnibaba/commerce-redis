@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 export const connectDB = async () => {
    try {
+    //"mongodb://localhost:27017/ecommerceReddisDB"
     const MONGO_URI = process.env.MONGO_URI
     const conn = await mongoose.connect(MONGO_URI)
     console.log(`MongoDB connected: ${conn.connection.host}`);
