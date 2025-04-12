@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom"
 import CategoryItem from "../components/CategoryItem"
+import { useCartStore } from "../stores/useCartStore"
+import { useEffect } from "react"
 
 
 const categories = [
@@ -12,6 +15,25 @@ const categories = [
 ]
 
 const HomePage = () => {
+  const { getCartItems, calculateTotals, unauthorized, cart } = useCartStore()
+
+  const navigate = useNavigate()
+
+
+  useEffect(() => {
+  
+    const init = async() => {
+      if(unauthorized) {
+        navigate("/login")
+        return
+      } 
+      
+      await getCartItems()
+      calculateTotals()
+      console.log(cart);
+    }
+    init()
+   }, [])
   return (
     <div className="relative min-h-screen text-white overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

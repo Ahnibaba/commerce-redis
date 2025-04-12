@@ -6,6 +6,7 @@ const useUserStore = create((set, get) => ({
   user: null,
   loading: false,
   checkingAuth: true,
+  unauthorized: false,
 
   signup: async ({ name, email, password, confirmPassword }) => {
     set({ loading: true })
@@ -56,6 +57,8 @@ const useUserStore = create((set, get) => ({
         set({ user: response.data, checkingAuth: false })
      } catch (error) {
         set({ user: null, checkingAuth: false })
+        error.response ? toast.error(error.response.data.error) : error.response.status === 401 ?
+        set({ unauthorized: true }) : toast.error(error.message)
      }
   },
 

@@ -21,13 +21,15 @@ const getCartProducts = async(req, res) => {
 const addToCart = async(req, res) => {
   try {
     const { productId } = req.body
+    console.log(productId);
+    
     const user = req.user
 
-    const existingItem = user.cartItem.find(item => item.id === productId)
+    const existingItem = user.cartItems.find(item => item.id === productId)
     if(existingItem) {
         existingItem.quantity += 1
     } else {
-        user.cartItem.push(productId)
+        user.cartItems.push(productId)
     }
 
     await user.save()
@@ -72,6 +74,9 @@ const updateQuantity = async(req, res) =>{
             return res.status(200).json(user.cartItems)
           } else {
             existingItem.quantity = quantity
+            await user.save();
+			      res.json(user.cartItems);
+
           }
         } else {
             return res.status(404).json({ error: "Product not found" })
