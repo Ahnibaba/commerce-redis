@@ -14,7 +14,7 @@ import job from "./cron/cron.js"
 dotenv.config()
 
 connectDB()
-job.start()
+//job.start()
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -47,7 +47,7 @@ app.use((req, res, next) => {
 });
 
 
-app.listen(5000, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`); 
   
   
