@@ -1,6 +1,8 @@
 import couponModel from "../models/coupon.model.js"
 import { stripe } from "../lib/stripe.js"
 import orderModel from "../models/order.model.js"
+import userModel from "../models/user.model.js"
+
 
 
 const createCheckoutSession = async (req, res) => {
@@ -25,7 +27,8 @@ const createCheckoutSession = async (req, res) => {
                         images: [product.image]
                     },
                     unit_amount: amount
-                }
+                },
+                quantity: product.quantity || 1,
             }
         })
 
@@ -37,11 +40,11 @@ const createCheckoutSession = async (req, res) => {
             }
         }
 
-        const session = await stripe.checkout.create({
+        const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card",],
             line_items: lineItems,
             mode: "payment",
-            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${process.env.CLIENT_URL}/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/purchase-cancel`,
             discounts: coupon
                 ? [
@@ -77,18 +80,19 @@ const createCheckoutSession = async (req, res) => {
 const checkoutSuccess = async (req, res) => {
     try {
         const { sessionId } = req.body
-        const session = await stripe.checkout.session.retrieve(sessionId)
+        const session = await stripe.checkout.sessions.retrieve(sessionId)
 
         if (session.payment_status === "paid") {
 
             if (session.metadata.couponCode) {
-                await couponModel.findOneAndUpdate({
+              await couponModel.findOneAndUpdate({
                     code: session.metadata.couponCode,
                     userId: session.metadata.userId
                 },
                     { isActive: false }
                 )
             }
+
 
             //create a new order
             const products = JSON.parse(session.metadata.products)
@@ -104,6 +108,10 @@ const checkoutSuccess = async (req, res) => {
             })
 
             await newOrder.save()
+
+
+            await userModel.findByIdAndUpdate(session.metadata.userId, { cartItems: [] })
+
             res.status(200).json({
                 success: true,
                 message: "Payment successful, order created, and coupon deactivated if used",
@@ -127,6 +135,7 @@ async function createStripeCoupon(discountPercentage) {
 }
 
 async function createNewCoupon(userId) {
+    await couponModel.findOneAndDelete({ userId })
     const newCoupon = new couponModel({
         code: "GIFT" + Math.random().toString(36).substring(2, 8).toUpperCase(),
         discountPercentage: 10,

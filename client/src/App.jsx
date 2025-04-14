@@ -3,35 +3,33 @@ import HomePage from "./pages/HomePage"
 import SignUpPage from "./pages/SignUpPage"
 import LoginPage from "./pages/LoginPage"
 import Navbar from "./components/Navbar"
-import useUserStore from "./stores/useUserStore"
+import { useUserStore } from "./stores/useUserStore";
 import { useEffect } from "react"
 import { Loader } from "lucide-react"
 import LoadingSpinner from "./components/LoadingSpinner"
 import AdminPage from "./pages/AdminPage"
 import CategoryPage from "./pages/CategoryPage"
 import CartPage from "./pages/CartPage"
-import { useCartStore } from "./stores/useCartStore"
+import PurchaseSuccessPage from "./pages/PurchaseSuccessPage"
+import PurchaseCancelPage from "./pages/PurchaseCancelPage"
 
 
 const App = () => {
-  const { user, checkAuth, checkingAuth, unauthorized } = useUserStore()
+  const { user, checkAuth, checkingAuth } = useUserStore()
 
-  const navigate = useNavigate()
-
+  console.log(checkingAuth);
+  
 
   useEffect(() => {
-    const init = async() => {
-      if(unauthorized) {
-        navigate("/login")
-      }
-      await checkAuth()
-    }
-    init()
+    
+      checkAuth()
+  
   }, [])
 
 
-  
+
   if (checkingAuth) return <LoadingSpinner />
+
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
       {/* Background gradient */}
@@ -51,6 +49,8 @@ const App = () => {
           <Route path="/secret-dashboard" element={user?.role === "admin" ? <AdminPage /> : <Navigate to={"/login"} />} />
           <Route path="/category/:category" element={<CategoryPage />}/>
           <Route path="/cart" element={user ? <CartPage /> : <Navigate to={"/login"} /> }/>
+          <Route path="/purchase-success" element={user ? <PurchaseSuccessPage /> : <Navigate to={"/login"} /> }/>
+          <Route path="/purchase-cancel" element={user ? <PurchaseCancelPage /> : <Navigate to={"/login"} /> }/>
         </Routes>
       </div>
     </div>

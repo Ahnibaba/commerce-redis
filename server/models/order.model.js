@@ -18,7 +18,7 @@ const orderSchema = new mongoose.Schema({
                 required: true,
                 min: 1,
             },
-            pice: {
+            price: {
                type: Number,
                required: true,
                min: 0, 

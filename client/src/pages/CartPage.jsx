@@ -11,25 +11,16 @@ import { useEffect } from "react"
 
 const CartPage = () => {
 
-  const { cart, getCartItems, calculateTotals, unauthorized, loading } = useCartStore()
+  const { cart, getCartItems, calculateTotals, loading } = useCartStore()
 
   const navigate = useNavigate()
 
 
   useEffect(() => {
 
-    const init = async () => {
-      if (unauthorized) {
-        navigate("/login")
-        return
-      }
-
-      await getCartItems()
-      calculateTotals()
-      console.log(cart);
-    }
-    init()
+    getCartItems()
   }, [])
+  
   return (
     <div className="py-8 md:py-16">
       <div className="mx-auto max-w-screen-xl px-4 2xl:px-0">

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { motion } from "framer-motion";
 import { ArrowRight, Loader, Lock, Mail, User, UserPlus } from "lucide-react"
 import { Link } from "react-router-dom"
-import useUserStore from "../stores/useUserStore";
+import { useUserStore } from "../stores/useUserStore";
 
 
 const SignUpPage = () => {

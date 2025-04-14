@@ -124,11 +124,19 @@ const logout = async (req, res) => {
 const refreshToken = async(req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken
-
+    console.log("I am refresh token", refreshToken);
+    
     if(!refreshToken) {
         return res.status(401).json({error: "No refresh token provided" })
     }
-    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+   
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid or expired refresh token" });
+    }
+    
     const storedToken = await redis.get(`refresh_token:${decoded.userId}`)
 
     if(storedToken !== refreshToken) {
@@ -160,10 +168,16 @@ const refreshToken = async(req, res) => {
 
 const getProfile = async(req, res) => {
     try {
-      res.json(req.user)
+      const user = await userModel.findById(req.user._id)
+      console.log(user);
+      
+      if(!user) {
+        return res.status(404).json({ error: "User not found" })
+      }
+      
+      res.status(200).json(user)
     } catch (error) {
       console.log("Error in getProfile function", error.message);
-      res.status(500).json({ message: "Server error", error: error.message })
     }
     
 }

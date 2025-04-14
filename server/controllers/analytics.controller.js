@@ -90,5 +90,7 @@ function getDatesInRange(startDate, endDate) {
         dates.push(currentDate.toISOString().split("T")[0])
         currentDate.setDate(currentDate.getDate() + 1)
     }
+
+    return dates
 }
 export { getAnalyticsData, getDailySalesData }
