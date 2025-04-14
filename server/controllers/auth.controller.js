@@ -86,7 +86,7 @@ const login = async (req, res) => {
            await storeRefreshToken(user._id, refreshToken)
            setCookies(res, accessToken, refreshToken)
         } else {
-            res.status(401).json({ error: "Invalid email or password" })
+            return res.status(401).json({ error: "Invalid email or password" })
         }
         res.status(200).json({ 
             _id: user._id,
