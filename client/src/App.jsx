@@ -14,17 +14,11 @@ import PurchaseCancelPage from "./pages/PurchaseCancelPage"
 
 const App = () => {
   const { user, checkAuth, checkingAuth } = useUserStore()
-  const set = useUserStore.setState // grab the Zustand updater directly
+  
 
   useEffect(() => {
     checkAuth()
-
-    // ⏳ Force timeout after 10s to stop loading
-    const timeout = setTimeout(() => {
-      set({ checkingAuth: false })
-    }, 6000)
-
-    return () => clearTimeout(timeout)
+  
   }, [])
 
   if (checkingAuth) return <LoadingSpinner />
@@ -41,7 +35,7 @@ const App = () => {
       <div className="relative z-50 pt-20">
         <Navbar />
         <Routes>
-          <Route path="/" element={user ? <HomePage /> : <Navigate to="/login" />} />
+          <Route path="/" element={user? <HomePage /> : <Navigate to="/login" />} />
           <Route path="/signup" element={!user ? <SignUpPage /> : <Navigate to="/" />} />
           <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/" />} />
           <Route path="/secret-dashboard" element={user?.role === "admin" ? <AdminPage /> : <Navigate to="/login" />} />
