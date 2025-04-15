@@ -5,7 +5,7 @@ import axios from "../lib/axios"
 
 export const useProductStore = create((set) => ({
     products: [],
-    loading: false,
+    loading: true,
     deleteItem: null,
     
 
@@ -53,6 +53,8 @@ export const useProductStore = create((set) => ({
         set({ error: "Failed to fetch products", loading: false })
         error.response ? toast.error(error.response.data.error) :
         toast.error(error.message)
+      } finally {
+        set({ loading: false })
       }
     },
 

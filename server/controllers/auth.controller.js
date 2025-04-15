@@ -166,20 +166,18 @@ const refreshToken = async(req, res) => {
   }
 }
 
-const getProfile = async(req, res) => {
-    try {
-      const user = await userModel.findById(req.user._id)
-      console.log(user);
-      
-      if(!user) {
-        return res.status(404).json({ error: "User not found" })
-      }
-      
-      res.status(200).json(user)
-    } catch (error) {
-      console.log("Error in getProfile function", error.message);
+const getProfile = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized - User not found" });
     }
-    
-}
+
+    res.status(200).json(req.user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 
 export { signup, login, logout, refreshToken, getProfile }

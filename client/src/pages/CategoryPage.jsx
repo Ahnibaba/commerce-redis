@@ -3,10 +3,11 @@ import { useProductStore } from "../stores/useProductStore"
 import { useParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import ProductCard from "../components/ProductCard"
+import { Loader } from "lucide-react"
 
 
 const CategoryPage = () => {
-  const { fetchProductsByCategory, products } = useProductStore()
+  const { fetchProductsByCategory, products, loading } = useProductStore()
   
   const { category } = useParams()
 
@@ -15,6 +16,10 @@ const CategoryPage = () => {
 
   }, [])
   console.log("products", products);
+
+  if(loading) {
+    return <LoadingCategory loading={loading} />
+  }
   
   return (
     <div className="min-h-screen">
@@ -34,7 +39,8 @@ const CategoryPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
-           {products?.length === 0 && (
+
+           {products?.length === 0 && !loading && (
              <h2 className="text-3xl font-semibold text-gray-300 text-center col-span-full">
                No Product found
              </h2>
@@ -50,3 +56,18 @@ const CategoryPage = () => {
 }
 
 export default CategoryPage
+
+
+
+const LoadingCategory = ({ loading }) => (
+
+  <motion.div
+    className="flex flex-col items-center justify-center space-y-4 py-16"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    <Loader size={20} className="animate-spin" />
+
+  </motion.div>
+)

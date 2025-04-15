@@ -60,8 +60,6 @@ export const useUserStore = create((set, get) => ({
       set({ user: response.data, checkingAuth: false })
 
     } catch (error) {
-      console.log("USER", error);
-      console.log(error);
       set({ user: null, checkingAuth: false })
 
     } 
@@ -97,8 +95,8 @@ export const useUserStore = create((set, get) => ({
 
   // TODO implement the axios interceptors for refreshing access token 15m
 
+  let isRefreshing = false;
 
-let isRefreshing = false;
 let refreshSubscribers = [];
 
 function onRefreshed() {
@@ -137,19 +135,15 @@ if(localStorage.getItem("user")) {
           isRefreshing = true;
           try {
             await axios.post("/auth/refresh-token");
-          
             isRefreshing = false;
-
             onRefreshed();
           } catch (refreshError) {
             console.log(refreshError);
-            
             isRefreshing = false;
-            
             
             return Promise.reject(refreshError); // for other errors
           }
-        }
+        } 
   
         return new Promise((resolve) => {
           addRefreshSubscriber(() => {
@@ -164,9 +158,7 @@ if(localStorage.getItem("user")) {
   
 }
 
-if(!useUserStore.getState().user) {
-  setTimeout(() => {
-    useUserStore.setState({ checkingAuth: false })
-  }, 6000)
-}
+
+ 
+
 
