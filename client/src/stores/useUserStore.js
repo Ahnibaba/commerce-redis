@@ -93,8 +93,6 @@ export const useUserStore = create((set, get) => ({
 
 
 
-// TODO implement the axios interceptors for refreshing access token 15m
-
 
 let isRefreshing = false;
 let refreshErrorHolder = null;
@@ -110,36 +108,21 @@ function onRefreshed() {
 }
 
 
-function waitForRefresh(timeout = 5000) {
+function waitForRefresh() {
   return new Promise((resolve, reject) => {
-    if (!isRefreshing) {
-      if (refreshErrorHolder) {
-        useUserStore.setState({ checkingAuth: false });
-        return reject(refreshErrorHolder);
-      } else {
-        return resolve();
-      }
-    }
-
-    const start = Date.now();
-    const interval = setInterval(() => {
+    setInterval(() => {
       if (!isRefreshing) {
-        clearInterval(interval);
         if (refreshErrorHolder) {
-          console.error("waitForRefresh detected refresh failure");
           useUserStore.setState({ checkingAuth: false });
-          reject(refreshErrorHolder);
+          return reject(refreshErrorHolder);
         } else {
-          resolve();
+          return resolve();
         }
-      } else if (Date.now() - start >= timeout) {
-        clearInterval(interval);
-        const timeoutError = new Error("Refresh timeout");
-        console.error("waitForRefresh rejected:", timeoutError.message);
-        useUserStore.setState({ checkingAuth: false });
-        reject(timeoutError);
       }
-    }, 100);
+
+    }, 100)
+
+
   });
 }
 

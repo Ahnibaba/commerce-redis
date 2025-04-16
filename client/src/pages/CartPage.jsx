@@ -20,6 +20,10 @@ const CartPage = () => {
 
     getCartItems()
   }, [])
+
+  if (loading) {
+    return <LoadingUI />
+  }
   
   return (
     <div className="py-8 md:py-16">
@@ -33,7 +37,7 @@ const CartPage = () => {
           >
 
             {cart.length === 0 ? (
-              <EmptyCartUI loading={loading} />
+              <EmptyCartUI />
             ) : (
               <div className="space-y-6">
                 {cart.map((item) => (
@@ -75,8 +79,7 @@ const EmptyCartUI = ({ loading }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    {loading ? (<Loader size={20} className="animate-spin" />) : (
-      <>
+    
         <ShoppingCart className="h-24 w-24 text-gray-300" />
         <h3 className="text-2xl font-semibold">Your cart is empty</h3>
         <p className="text-gray-400">Looks like you haven't added anything to your cart yet.</p>
@@ -88,8 +91,21 @@ const EmptyCartUI = ({ loading }) => (
           Start Shopping
         </Link>
 
-      </>
-    )}
+
+
+  </motion.div>
+)
+const LoadingUI = () => (
+
+  <motion.div
+    className="flex flex-col items-center justify-center space-y-4 py-16"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    
+    <Loader size={20} className="animate-spin" />
+
 
   </motion.div>
 )
