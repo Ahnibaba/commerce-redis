@@ -53,7 +53,7 @@ export const useUserStore = create((set, get) => ({
   },
 
   checkAuth: async () => {
-    await waitForRefresh(); // 🕓 wait if refresh is happening
+    await waitForRefresh()
     set({ checkingAuth: true })
     try {
       const response = await axios.get("/auth/profile")
@@ -93,14 +93,13 @@ export const useUserStore = create((set, get) => ({
 
 
 
+// TODO implement the axios interceptors for refreshing access token 15m
+
 
 let isRefreshing = false;
 let refreshErrorHolder = null;
 const subscribers = [];
 
-function addRefreshSubscriber(callback) {
-  subscribers.push(callback);
-}
 
 function onRefreshed() {
   subscribers.forEach(callback => callback());
@@ -108,21 +107,34 @@ function onRefreshed() {
 }
 
 
-function waitForRefresh() {
+function waitForRefresh(timeout = 5000) {
   return new Promise((resolve, reject) => {
-    setInterval(() => {
+    if (!isRefreshing) {
+      if (refreshErrorHolder) {
+        useUserStore.setState({ checkingAuth: false });
+        return reject(refreshErrorHolder);
+      } else {
+        return resolve();
+      }
+    }
+
+    const start = Date.now();
+    const interval = setInterval(() => {
       if (!isRefreshing) {
+        clearInterval(interval);
         if (refreshErrorHolder) {
           useUserStore.setState({ checkingAuth: false });
-          return reject(refreshErrorHolder);
+          reject(refreshErrorHolder);
         } else {
-          return resolve();
+          resolve();
         }
+      } else if (Date.now() - start >= timeout) {
+        clearInterval(interval);
+        useUserStore.setState({ checkingAuth: false });
+        useUserStore.getState().logout()
+        reject();
       }
-
-    }, 100)
-
-
+    }, 100);
   });
 }
 
@@ -144,7 +156,6 @@ if (localStorage.getItem("user")) {
             isRefreshing = false;
             onRefreshed();
           } catch (refreshError) {
-            console.error("Refresh token request failed:", refreshError);
             refreshErrorHolder = refreshError;
             isRefreshing = false;
             onRefreshed(); // still notify waiting requests
@@ -157,8 +168,6 @@ if (localStorage.getItem("user")) {
           // Only retry if refresh succeeded
           return axios(originalRequest);
         } catch (err) {
-          // Now you can make a decision here, e.g. logout user
-          console.error("Interceptor caught failed refresh:", err.message);
           // e.g., logoutUser(); or redirect to login
           return Promise.reject(err); // let it bubble to caller
         }

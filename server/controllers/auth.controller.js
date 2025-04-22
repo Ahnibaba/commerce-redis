@@ -11,7 +11,7 @@ const generateTokens = (userId) => {
   const accessToken = jwt.sign(
     { userId },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1m" }
+    { expiresIn: "15m" }
   )
   const refreshToken = jwt.sign(
     { userId },
@@ -31,7 +31,7 @@ const setCookies = (res, accessToken, refreshToken) => {
       httpOnly: true, //prevent XSS attacks, cross site scripting attack
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict", // prevents CSRF attack, cross-site request forgery
-      maxAge: 1 * 60 * 1000, // 15 minutes
+      maxAge: 15 * 60 * 1000, // 15 minutes
 
 
     }) 
@@ -146,14 +146,14 @@ const refreshToken = async(req, res) => {
     const accessToken = jwt.sign(
         { userId: decoded.userId },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "1m" }
+        { expiresIn: "15m" }
     )
 
     res.cookie("accessToken", accessToken, {
         httpOnly: true, //prevent XSS attacks, cross site scripting attack
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict", // prevents CSRF attack, cross-site request forgery
-        maxAge: 1 * 60 * 1000, // 15 minutes
+        maxAge: 15 * 60 * 1000, // 15 minutes
   
   
     }) 
