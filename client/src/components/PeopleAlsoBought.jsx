@@ -28,9 +28,9 @@ const PeopleAlsoBought = () => {
      fetchRecommendations()
   }, [])
 
-  if(isLoading) {
-    return <LoadingSpinner />
-  }
+  // if(isLoading) {
+  //   return <LoadingSpinner />
+  // }
   return (
     <div className="mt-8">
        <h3 className="text-2xl font-semibold text-emerald-400">
