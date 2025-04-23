@@ -30,7 +30,7 @@ const setCookies = (res, accessToken, refreshToken) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true, //prevent XSS attacks, cross site scripting attack
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict", // prevents CSRF attack, cross-site request forgery
+      sameSite: "lax", // prevents CSRF attack, cross-site request forgery
       maxAge: 15 * 60 * 1000, // 15 minutes
 
 
@@ -38,7 +38,7 @@ const setCookies = (res, accessToken, refreshToken) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true, //prevent XSS attacks, cross site scripting attack
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict", // prevents CSRF attack, cross-site request forgery
+      sameSite: "lax", // prevents CSRF attack, cross-site request forgery
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 
 
@@ -136,7 +136,7 @@ const refreshToken = async(req, res) => {
     } catch (err) {
       return res.status(401).json({ error: "Invalid or expired refresh token" });
     }
-    
+
     const storedToken = await redis.get(`refresh_token:${decoded.userId}`)
 
     if(storedToken !== refreshToken) {
@@ -152,7 +152,7 @@ const refreshToken = async(req, res) => {
     res.cookie("accessToken", accessToken, {
         httpOnly: true, //prevent XSS attacks, cross site scripting attack
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict", // prevents CSRF attack, cross-site request forgery
+        sameSite: "lax", // prevents CSRF attack, cross-site request forgery
         maxAge: 15 * 60 * 1000, // 15 minutes
   
   
