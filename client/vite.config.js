@@ -11,7 +11,7 @@ export default defineConfig({
   server:{
     proxy:{
       "/api": {
-        target: "https://commerce-redis.onrender.com"
+        target: "https://commerce-redis.onrender.com/"
       }
     }
   }
