@@ -23,7 +23,10 @@ const generateTokens = (userId) => {
 }
 
 const storeRefreshToken = async (userId, refreshToken) => {
-   await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7*24*60*60)  // 7days
+  // Use a set to store multiple refresh tokens
+  await redis.sadd(`user-${userId}:refresh_tokens`, refreshToken);
+  // Set expiration for each token (7 days)
+  await redis.expire(`user-${userId}:refresh_tokens`, 7*24*60*60);
 }
 
 const setCookies = (res, accessToken, refreshToken) => {
