@@ -1,6 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
 import productModel from "../models/product.model.js"
-import { redis } from "../lib/redis.js"
+// import { redis } from "../lib/redis.js"
 
 
 const getAllProducts = async (req, res) => {
@@ -18,10 +18,11 @@ const getAllProducts = async (req, res) => {
 
 const getFeaturedProducts = async (req, res) => {
     try {
-        let featuredProducts = await redis.get("featured_products")
-        if (featuredProducts) {
-            return res.json(JSON.parse(featuredProducts))
-        }
+        let featuredProducts
+        // featuredProducts = await redis.get("featured_products")
+        // if (featuredProducts) {
+        //     return res.json(JSON.parse(featuredProducts))
+        // }
 
         // if not in redis, fetch from mongodb
         // .lean() is gonna return a plain javascript object instead of a mongodb document
@@ -33,7 +34,7 @@ const getFeaturedProducts = async (req, res) => {
         }
 
         // store in redis for future quick access
-        await redis.set("featured_products", JSON.stringify(featuredProducts))
+        // await redis.set("featured_products", JSON.stringify(featuredProducts))
 
         res.status(200).json(featuredProducts)
 

@@ -1,4 +1,4 @@
-import { redis } from "../lib/redis.js"
+// import { redis } from "../lib/redis.js"
 import userModel from "../models/user.model.js"
 import jwt from "jsonwebtoken"
 // import crypto from "crypto"
@@ -22,9 +22,9 @@ const generateTokens = (userId) => {
   return { accessToken, refreshToken }
 }
 
-const storeRefreshToken = async (userId, refreshToken) => {
-   await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7*24*60*60)  // 7days
-}
+// const storeRefreshToken = async (userId, refreshToken) => {
+//    await redis.set(`refresh_token:${userId}`, refreshToken, "EX", 7*24*60*60)  // 7days
+// }
 
 const setCookies = (res, accessToken, refreshToken) => {
     res.cookie("accessToken", accessToken, {
@@ -57,7 +57,7 @@ const signup = async (req, res) => {
 
         // authenticate user
         const { accessToken, refreshToken } = generateTokens(user._id)
-        await storeRefreshToken(user._id, refreshToken)
+       // await storeRefreshToken(user._id, refreshToken)
         
         setCookies(res, accessToken, refreshToken)
         
@@ -83,17 +83,19 @@ const login = async (req, res) => {
         if(user && (await user.comparePassword(password))) {
            const { accessToken, refreshToken } = generateTokens(user._id)
 
-           await storeRefreshToken(user._id, refreshToken)
+         //  await storeRefreshToken(user._id, refreshToken)
            setCookies(res, accessToken, refreshToken)
-        } else {
-            return res.status(401).json({ error: "Invalid email or password" })
-        }
-        res.status(200).json({ 
+
+           res.status(200).json({ 
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role
       })
+        } else {
+            return res.status(400).json({ error: "Invalid email or password" })
+        }
+        
     } catch (error) {
         console.log("Error in login function", error.message);
         res.status(500).json({ error: error.message })
@@ -106,7 +108,7 @@ const logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken
     if(refreshToken){
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
-      await redis.del(`refresh_token:${decoded.userId}`) 
+      //await redis.del(`refresh_token:${decoded.userId}`) 
     }
     
     res.clearCookie("accessToken")
@@ -136,11 +138,11 @@ const refreshToken = async(req, res) => {
       return res.status(401).json({ error: "Invalid or expired refresh token" });
     }
 
-    const storedToken = await redis.get(`refresh_token:${decoded.userId}`)
+    // const storedToken = await redis.get(`refresh_token:${decoded.userId}`)
 
-    if(storedToken !== refreshToken) {
-      return res.status(403).json({ message: "Invalid refresh token" })
-    }
+    // if(storedToken !== refreshToken) {
+    //   return res.status(403).json({ message: "Invalid refresh token" })
+    // }
 
     const accessToken = jwt.sign(
         { userId: decoded.userId },
